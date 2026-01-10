@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -31,7 +31,10 @@ import {
   X,
   Timer,
   WifiOff,
-  CloudCheck
+  CloudCheck,
+  PartyPopper,
+  Sparkles,
+  RotateCcw
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -63,7 +66,7 @@ const Onboarding: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       <div className="w-20 h-20 bg-pula-100 dark:bg-pula-900/30 rounded-3xl flex items-center justify-center mb-6 rotate-3 shadow-xl">
         <TrendingUp className="w-10 h-10 text-pula-600" />
       </div>
-      <h2 className="text-2xl font-bold mb-4">{steps[step].title}</h2>
+      <h2 className="text-2xl font-bold mb-4 dark:text-white">{steps[step].title}</h2>
       <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-sm leading-relaxed">{steps[step].desc}</p>
       <div className="flex gap-2 mb-8">
         {steps.map((_, i) => (
@@ -76,6 +79,65 @@ const Onboarding: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       >
         {step === steps.length - 1 ? "Start Your Journey" : "Next"} <ChevronRight className="w-5 h-5" />
       </button>
+    </div>
+  );
+};
+
+const GraduationScreen: React.FC<{ stats: any, onRestart: () => void, onContinue: () => void }> = ({ stats, onRestart, onContinue }) => {
+  return (
+    <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-y-auto flex flex-col items-center p-6 text-center">
+      <div className="mt-12 mb-8 relative">
+        <div className="absolute inset-0 animate-ping opacity-20 bg-amber-400 rounded-full" />
+        <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl relative z-10">
+          <Trophy className="w-12 h-12 text-white" />
+        </div>
+      </div>
+      
+      <h1 className="text-3xl font-black mb-2 dark:text-white">Challenge Complete!</h1>
+      <p className="text-gray-500 dark:text-gray-400 mb-8">You've successfully tracked 30 days of hustle.</p>
+      
+      <div className="w-full max-w-sm bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-700 mb-8">
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Final Mission Stats</p>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="text-left">
+             <p className="text-2xl font-black text-pula-600">{stats.earned}</p>
+             <p className="text-[10px] font-bold text-gray-400 uppercase">Total Earned</p>
+          </div>
+          <div className="text-left">
+             <p className="text-2xl font-black text-amber-600">{stats.studied}h</p>
+             <p className="text-[10px] font-bold text-gray-400 uppercase">Hours Studied</p>
+          </div>
+          <div className="text-left">
+             <p className="text-2xl font-black text-calm-600">{stats.apps}</p>
+             <p className="text-[10px] font-bold text-gray-400 uppercase">Apps Sent</p>
+          </div>
+          <div className="text-left">
+             <p className="text-2xl font-black text-gray-900 dark:text-white">{stats.streak}</p>
+             <p className="text-[10px] font-bold text-gray-400 uppercase">Final Streak</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full max-w-sm space-y-4">
+        <button 
+          onClick={onContinue}
+          className="w-full bg-pula-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-pula-500/30 flex items-center justify-center gap-3 active:scale-95 transition-transform"
+        >
+          <Sparkles size={20} /> Keep Hustling
+        </button>
+        <button 
+          onClick={onRestart}
+          className="w-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 active:scale-95 transition-transform"
+        >
+          <RotateCcw size={20} /> Restart Challenge
+        </button>
+      </div>
+      
+      <div className="mt-12 flex items-center gap-2 opacity-30">
+        <PartyPopper className="text-amber-500" />
+        <span className="text-[10px] font-bold uppercase tracking-widest dark:text-white">Graduation Class of {new Date().getFullYear()}</span>
+        <PartyPopper className="text-amber-500" />
+      </div>
     </div>
   );
 };
@@ -127,6 +189,12 @@ const App: React.FC = () => {
   const [showLogModal, setShowLogModal] = useState<'earning' | 'application' | 'skill' | 'addSkill' | 'weeklyReview' | 'customBadge' | 'weeklyGoal' | null>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [hasDismissedGraduation, setHasDismissedGraduation] = useState(false);
+
+  // Gesture Refs
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const TABS = ['dashboard', 'tasks', 'earnings', 'apps', 'learning', 'settings'];
 
   useEffect(() => {
     localStorage.setItem('hustle_state_v2', JSON.stringify(state));
@@ -178,7 +246,35 @@ const App: React.FC = () => {
 
   const activeSkills = state.skills.filter(s => s.status === 'active');
 
+  const currentDay = Math.floor((new Date().getTime() - new Date(state.startDate).getTime()) / 86400000) + 1;
+  const isGraduated = currentDay > 30 && !hasDismissedGraduation;
+
   // Handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaY = touchEndY - touchStartY.current;
+
+    // Minimum distance for a swipe, and ensure it's mostly horizontal
+    const swipeThreshold = 50;
+    if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+      const currentIndex = TABS.indexOf(activeTab);
+      if (deltaX > 0) {
+        // Swipe Right (Move Left)
+        if (currentIndex > 0) setActiveTab(TABS[currentIndex - 1]);
+      } else {
+        // Swipe Left (Move Right)
+        if (currentIndex < TABS.length - 1) setActiveTab(TABS[currentIndex + 1]);
+      }
+    }
+  };
+
   const toggleTask = (taskId: string) => {
     setState(prev => {
       const current = prev.completedTasks[todayKey] || [];
@@ -340,7 +436,20 @@ const App: React.FC = () => {
     return <Onboarding onComplete={() => setState(p => ({ ...p, onboardingComplete: true }))} />;
   }
 
-  const currentDay = Math.floor((new Date().getTime() - new Date(state.startDate).getTime()) / 86400000) + 1;
+  if (isGraduated) {
+    return (
+      <GraduationScreen 
+        stats={{
+          earned: formatPula(totalEarnings),
+          studied: totalHours,
+          apps: state.applications.length,
+          streak: streakCount
+        }} 
+        onContinue={() => setHasDismissedGraduation(true)}
+        onRestart={resetApp}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen pb-24 dark:bg-gray-900 transition-colors">
@@ -353,7 +462,9 @@ const App: React.FC = () => {
           </div>
           <div>
             <h1 className="font-bold text-lg leading-tight tracking-tight dark:text-white">Hustle Track</h1>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">W{weekNum} • DAY {currentDay}</p>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+              {currentDay > 28 ? 'FINAL WEEK' : `W${weekNum}`} • {currentDay > 30 ? 'GRADUATE' : `DAY ${currentDay}`}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -372,11 +483,15 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-md mx-auto p-4 space-y-6">
+      <main 
+        className="max-w-md mx-auto p-4 space-y-6 overflow-x-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
 
         {/* --- TAB: Dashboard --- */}
         {activeTab === 'dashboard' && (
-          <>
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
             <div className="bg-gradient-to-br from-pula-600 to-pula-700 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-pula-500/30 relative overflow-hidden">
               <div className="relative z-10">
                 <p className="text-pula-100 text-sm font-medium italic opacity-90 leading-relaxed mb-6">"{dailyQuote}"</p>
@@ -385,7 +500,7 @@ const App: React.FC = () => {
                     <span className="text-5xl font-black">{streakCount}</span>
                     <span className="ml-2 text-xs font-bold text-pula-100 uppercase tracking-widest">Day Streak</span>
                   </div>
-                  <button onClick={() => setShowLogModal('weeklyReview')} className="bg-white/20 px-4 py-2.5 rounded-2xl text-xs font-bold backdrop-blur-md border border-white/10 flex items-center gap-2 hover:bg-white/30 transition-all">
+                  <button onClick={() => setShowLogModal('weeklyReview')} className="bg-white/20 dark:bg-gray-800/40 px-4 py-2.5 rounded-2xl text-xs font-bold backdrop-blur-md border border-white/10 dark:border-gray-700 flex items-center gap-2 hover:bg-white/30 dark:hover:bg-gray-700/60 transition-all">
                     <History size={14} /> Review
                   </button>
                 </div>
@@ -440,6 +555,15 @@ const App: React.FC = () => {
                 <Award className="w-5 h-5 text-amber-500" /> Your Milestones
               </h3>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                {/* 30-Day Survivor Badge (Dynamic) */}
+                {currentDay >= 30 && (
+                  <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                    <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl bg-amber-100 dark:bg-amber-900/40 border-2 border-amber-400 shadow-lg shadow-amber-500/20">
+                      🎓
+                    </div>
+                    <span className="text-[9px] font-black text-center w-16 leading-tight uppercase text-amber-600 dark:text-amber-400">Graduate</span>
+                  </div>
+                )}
                 {/* Built-in Badges */}
                 {BADGE_DEFINITIONS.map(badge => (
                   <div key={badge.id} className={`flex-shrink-0 flex flex-col items-center gap-2 transition-all ${badge.criteria(state) ? 'opacity-100 scale-100' : 'opacity-20 grayscale'}`}>
@@ -466,12 +590,12 @@ const App: React.FC = () => {
                 </button>
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* --- TAB: Habits --- */}
         {activeTab === 'tasks' && (
-          <div className="space-y-6">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -556,7 +680,7 @@ const App: React.FC = () => {
 
         {/* --- TAB: Money --- */}
         {activeTab === 'earnings' && (
-          <div className="space-y-6">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
             <button onClick={() => setShowLogModal('earning')} className="w-full bg-pula-600 text-white p-6 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-pula-500/30 active:scale-95 transition-transform">
               <PlusCircle size={24} /> Log New Earning
             </button>
@@ -597,7 +721,7 @@ const App: React.FC = () => {
                         border: 'none', 
                         boxShadow: '0 8px 24px rgba(0,0,0,0.1)', 
                         padding: '12px',
-                        backgroundColor: state.theme === 'dark' ? '#1f2937' : '#ffffff',
+                        backgroundColor: state.theme === 'dark' ? '#111827' : '#ffffff',
                         color: state.theme === 'dark' ? '#ffffff' : '#000000'
                       }} 
                       formatter={(val) => [formatPula(val as number), 'Earned']}
@@ -632,7 +756,7 @@ const App: React.FC = () => {
 
         {/* --- TAB: Apps --- */}
         {activeTab === 'apps' && (
-          <div className="space-y-6">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
              <button onClick={() => setShowLogModal('application')} className="w-full bg-calm-600 text-white p-6 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-calm-500/30 active:scale-95 transition-transform">
                <PlusCircle size={24} /> Log Application
              </button>
@@ -682,7 +806,7 @@ const App: React.FC = () => {
 
         {/* --- TAB: Skills --- */}
         {activeTab === 'learning' && (
-          <div className="space-y-6">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-black dark:text-white">Skill Mastery</h2>
@@ -757,7 +881,7 @@ const App: React.FC = () => {
 
         {/* --- TAB: Settings/Goals --- */}
         {activeTab === 'settings' && (
-          <div className="space-y-6">
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm">
               <div className="p-6 bg-gray-50/50 dark:bg-gray-900/40 border-b border-gray-100 dark:border-gray-700">
                 <h3 className="font-black flex items-center gap-3 dark:text-white"><Settings size={18} /> Settings</h3>
@@ -783,7 +907,7 @@ const App: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
                <button onClick={() => setShowLogModal('weeklyGoal')} className="w-full flex items-center justify-between p-4 bg-pula-50/50 dark:bg-pula-900/20 rounded-2xl mb-4 group active:scale-[0.98] transition-transform border dark:border-pula-900/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center text-pula-600 shadow-sm group-active:scale-90 transition-transform">
+                    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-pula-600 shadow-sm group-active:scale-90 transition-transform">
                       <Target size={20} />
                     </div>
                     <span className="font-bold dark:text-gray-100">Add Weekly Goal</span>
@@ -836,7 +960,7 @@ const App: React.FC = () => {
             <button onClick={() => { setShowLogModal(null); setSelectedSkillId(null); }} className="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
               <ChevronDown size={28} />
             </button>
-            <div className="w-12 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mx-auto mb-10" />
+            <div className="w-12 h-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-full mx-auto mb-10" />
             
             {showLogModal === 'earning' && (
               <form onSubmit={(e) => {
@@ -968,17 +1092,17 @@ const App: React.FC = () => {
                  </div>
                  
                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-pula-50 dark:bg-pula-900/40 p-6 rounded-3xl border border-pula-100 dark:border-pula-800">
+                    <div className="bg-pula-50 dark:bg-pula-900/30 p-6 rounded-3xl border border-pula-100 dark:border-pula-800/60 shadow-sm">
                        <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Earned</p>
                        <p className="text-2xl font-black text-pula-600 dark:text-pula-400">{formatPula(totalEarnings)}</p>
                     </div>
-                    <div className="bg-amber-50 dark:bg-amber-900/40 p-6 rounded-3xl border border-amber-100 dark:border-amber-800">
+                    <div className="bg-amber-50 dark:bg-amber-900/30 p-6 rounded-3xl border border-amber-100 dark:border-amber-800/60 shadow-sm">
                        <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Studied</p>
                        <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{totalHours}h</p>
                     </div>
                  </div>
 
-                 <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-3xl border border-gray-100 dark:border-gray-700">
+                 <div className="bg-gray-50 dark:bg-gray-800/40 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/50">
                     <h4 className="font-bold text-sm mb-3 flex items-center gap-2 dark:text-gray-300">
                        <History size={14} className="text-gray-400" /> Skill Breakdown
                     </h4>
@@ -992,7 +1116,7 @@ const App: React.FC = () => {
                     </div>
                  </div>
 
-                 <button onClick={() => setShowLogModal(null)} className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 p-6 rounded-2xl font-black text-lg active:scale-95 transition-transform">Back to Work</button>
+                 <button onClick={() => setShowLogModal(null)} className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 p-6 rounded-2xl font-black text-lg active:scale-95 transition-transform shadow-xl shadow-gray-500/10">Back to Work</button>
               </div>
             )}
           </div>
