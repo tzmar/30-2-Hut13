@@ -346,13 +346,13 @@ const App: React.FC = () => {
     <div className="min-h-screen pb-24 dark:bg-gray-900 transition-colors">
       
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center">
+      <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-pula-600 rounded-2xl flex items-center justify-center shadow-lg shadow-pula-500/20 active:rotate-12 transition-transform">
             <TrendingUp className="text-white w-6 h-6" />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight tracking-tight">Hustle Track</h1>
+            <h1 className="font-bold text-lg leading-tight tracking-tight dark:text-white">Hustle Track</h1>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">W{weekNum} • DAY {currentDay}</p>
           </div>
         </div>
@@ -366,7 +366,7 @@ const App: React.FC = () => {
                <CloudCheck size={10} /> Sync
             </div>
           )}
-          <button onClick={() => setState(p => ({ ...p, theme: p.theme === 'light' ? 'dark' : 'light' }))} className="p-2.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+          <button onClick={() => setState(p => ({ ...p, theme: p.theme === 'light' ? 'dark' : 'light' }))} className="p-2.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors">
             {state.theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
         </div>
@@ -385,7 +385,7 @@ const App: React.FC = () => {
                     <span className="text-5xl font-black">{streakCount}</span>
                     <span className="ml-2 text-xs font-bold text-pula-100 uppercase tracking-widest">Day Streak</span>
                   </div>
-                  <button onClick={() => setShowLogModal('weeklyReview')} className="bg-white/20 px-4 py-2.5 rounded-2xl text-xs font-bold backdrop-blur-md border border-white/10 flex items-center gap-2">
+                  <button onClick={() => setShowLogModal('weeklyReview')} className="bg-white/20 px-4 py-2.5 rounded-2xl text-xs font-bold backdrop-blur-md border border-white/10 flex items-center gap-2 hover:bg-white/30 transition-all">
                     <History size={14} /> Review
                   </button>
                 </div>
@@ -397,22 +397,22 @@ const App: React.FC = () => {
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                    <Target size={16} className="text-pula-600" />
-                   <h3 className="font-bold">Month Goal: {formatPula(state.monthlyGoalMin)}</h3>
+                   <h3 className="font-bold dark:text-white">Month Goal: {formatPula(state.monthlyGoalMin)}</h3>
                 </div>
                 <span className="text-xs font-black text-pula-600 bg-pula-50 dark:bg-pula-900/30 px-3 py-1.5 rounded-xl">
                   {Math.round((totalEarnings / state.monthlyGoalMin) * 100)}%
                 </span>
               </div>
-              <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-50 dark:border-gray-800">
+              <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-50 dark:border-gray-900">
                 <div className="h-full bg-pula-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, (totalEarnings / state.monthlyGoalMin) * 100)}%` }} />
               </div>
               <div className="mt-5 flex justify-between items-center text-sm">
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Earned</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Earned</p>
                   <p className="font-black text-gray-900 dark:text-white">{formatPula(totalEarnings)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Saving ({state.savingsRate}%)</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Saving ({state.savingsRate}%)</p>
                   <p className="font-black text-calm-600">{formatPula(totalEarnings * (state.savingsRate / 100))}</p>
                 </div>
               </div>
@@ -423,46 +423,46 @@ const App: React.FC = () => {
                  <div className="w-8 h-8 bg-calm-100 dark:bg-calm-900/30 rounded-xl flex items-center justify-center text-calm-600 mb-3">
                    <Briefcase size={16} />
                  </div>
-                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Applications</p>
-                 <p className="text-2xl font-black">{state.applications.length}</p>
+                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Applications</p>
+                 <p className="text-2xl font-black dark:text-white">{state.applications.length}</p>
                </div>
                <div className="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
                  <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600 mb-3">
                    <BookOpen size={16} />
                  </div>
-                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Study Hours</p>
-                 <p className="text-2xl font-black">{totalHours}h</p>
+                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Study Hours</p>
+                 <p className="text-2xl font-black dark:text-white">{totalHours}h</p>
                </div>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold flex items-center gap-2">
+              <h3 className="font-bold flex items-center gap-2 dark:text-white">
                 <Award className="w-5 h-5 text-amber-500" /> Your Milestones
               </h3>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {/* Built-in Badges */}
                 {BADGE_DEFINITIONS.map(badge => (
                   <div key={badge.id} className={`flex-shrink-0 flex flex-col items-center gap-2 transition-all ${badge.criteria(state) ? 'opacity-100 scale-100' : 'opacity-20 grayscale'}`}>
-                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-sm ${badge.criteria(state) ? 'bg-amber-50 border-2 border-amber-200' : 'bg-gray-100'}`}>
+                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-sm ${badge.criteria(state) ? 'bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-700' : 'bg-gray-100 dark:bg-gray-800'}`}>
                       {badge.icon}
                     </div>
-                    <span className="text-[9px] font-bold text-center w-16 leading-tight uppercase text-gray-500">{badge.name}</span>
+                    <span className="text-[9px] font-bold text-center w-16 leading-tight uppercase text-gray-500 dark:text-gray-400">{badge.name}</span>
                   </div>
                 ))}
                 {/* Custom Badges */}
                 {state.customBadges.map(badge => (
                   <div key={badge.id} className="flex-shrink-0 flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl bg-pula-50 border-2 border-pula-200 shadow-sm">
+                    <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl bg-pula-50 dark:bg-pula-900/30 border-2 border-pula-200 dark:border-pula-700 shadow-sm">
                       {badge.icon}
                     </div>
-                    <span className="text-[9px] font-bold text-center w-16 leading-tight uppercase text-pula-600">{badge.name}</span>
+                    <span className="text-[9px] font-bold text-center w-16 leading-tight uppercase text-pula-600 dark:text-pula-400">{badge.name}</span>
                   </div>
                 ))}
                 <button onClick={() => setShowLogModal('customBadge')} className="flex-shrink-0 flex flex-col items-center gap-2 group">
                    <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400 group-hover:border-pula-400 group-hover:text-pula-400 transition-colors">
                      <Plus size={24} />
                    </div>
-                   <span className="text-[9px] font-bold uppercase text-gray-400">Add Goal</span>
+                   <span className="text-[9px] font-bold uppercase text-gray-400 tracking-wider">Add Goal</span>
                 </button>
               </div>
             </div>
@@ -475,7 +475,7 @@ const App: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-2xl font-black">Daily Habits</h2>
+                  <h2 className="text-2xl font-black dark:text-white">Daily Habits</h2>
                   <p className="text-sm text-gray-500">Hustle smarter, not harder.</p>
                 </div>
                 <div className="text-right">
@@ -491,12 +491,12 @@ const App: React.FC = () => {
                     <div key={task.id} className="flex items-center gap-2 group">
                       <button 
                         onClick={() => toggleTask(task.id)} 
-                        className={`flex-1 flex items-center gap-4 p-4 rounded-2xl border transition-all ${isDone ? 'bg-pula-50/50 border-pula-100 dark:bg-pula-900/10 dark:border-pula-800 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98]'}`}
+                        className={`flex-1 flex items-center gap-4 p-4 rounded-2xl border transition-all ${isDone ? 'bg-pula-50/50 border-pula-100 dark:bg-pula-900/20 dark:border-pula-800 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98]'}`}
                       >
                         <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${isDone ? 'bg-pula-600 border-pula-600' : 'border-gray-200 dark:border-gray-600'}`}>
                           {isDone && <CheckSquare className="w-4 h-4 text-white" />}
                         </div>
-                        <span className={`text-sm font-medium text-left flex-1 ${isDone ? 'line-through text-gray-400' : ''}`}>{task.text}</span>
+                        <span className={`text-sm font-medium text-left flex-1 ${isDone ? 'line-through text-gray-400' : 'dark:text-gray-100'}`}>{task.text}</span>
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); removePreloadedTask(task.id); }}
@@ -515,14 +515,14 @@ const App: React.FC = () => {
                     <div key={`custom-${idx}`} className="flex items-center gap-2">
                       <button 
                         onClick={() => toggleCustomTask(task)} 
-                        className={`flex-1 flex items-center gap-4 p-4 rounded-2xl border transition-all ${isDone ? 'bg-pula-50/50 border-pula-100 dark:bg-pula-900/10 dark:border-pula-800 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98]'}`}
+                        className={`flex-1 flex items-center gap-4 p-4 rounded-2xl border transition-all ${isDone ? 'bg-pula-50/50 border-pula-100 dark:bg-pula-900/20 dark:border-pula-800 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98]'}`}
                       >
                         <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${isDone ? 'bg-pula-600 border-pula-600' : 'border-gray-200 dark:border-gray-600'}`}>
                           {isDone && <CheckSquare className="w-4 h-4 text-white" />}
                         </div>
                         <div className="flex-1 flex justify-between items-center mr-2">
-                          <span className={`text-sm font-medium text-left ${isDone ? 'line-through text-gray-400' : ''}`}>{task}</span>
-                          <span className="text-[10px] font-bold text-pula-600 bg-pula-50 dark:bg-pula-900/30 px-2 py-0.5 rounded-lg uppercase ml-2">User</span>
+                          <span className={`text-sm font-medium text-left ${isDone ? 'line-through text-gray-400' : 'dark:text-gray-100'}`}>{task}</span>
+                          <span className="text-[10px] font-bold text-pula-600 bg-pula-50 dark:bg-pula-900/40 px-2 py-0.5 rounded-lg uppercase ml-2 border dark:border-pula-800">User</span>
                         </div>
                       </button>
                       <button 
@@ -544,7 +544,7 @@ const App: React.FC = () => {
                   addCustomTask(input.value);
                   input.value = '';
                 }} className="relative">
-                  <input name="task" placeholder="Add custom task..." className="w-full pl-4 pr-12 py-4 rounded-2xl bg-gray-100 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-medium text-sm" />
+                  <input name="task" placeholder="Add custom task..." className="w-full pl-4 pr-12 py-4 rounded-2xl bg-gray-100 dark:bg-gray-700 border-none outline-none focus:ring-2 ring-pula-500 font-medium text-sm dark:text-white" />
                   <button type="submit" className="absolute right-2 top-2 w-10 h-10 bg-pula-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-pula-500/20 active:scale-90">
                     <Plus size={20} />
                   </button>
@@ -579,8 +579,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm h-72">
-               <h3 className="font-bold mb-6 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm h-72 overflow-hidden">
+               <h3 className="font-bold mb-6 flex items-center gap-2 dark:text-white">
                  <TrendingUp size={18} className="text-pula-600" /> Earning Velocity
                </h3>
                <ResponsiveContainer width="100%" height="80%">
@@ -592,7 +592,14 @@ const App: React.FC = () => {
                       </linearGradient>
                     </defs>
                     <Tooltip 
-                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', padding: '12px' }} 
+                      contentStyle={{ 
+                        borderRadius: '16px', 
+                        border: 'none', 
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.1)', 
+                        padding: '12px',
+                        backgroundColor: state.theme === 'dark' ? '#1f2937' : '#ffffff',
+                        color: state.theme === 'dark' ? '#ffffff' : '#000000'
+                      }} 
                       formatter={(val) => [formatPula(val as number), 'Earned']}
                     />
                     <Area type="monotone" dataKey="amount" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorEarning)" />
@@ -601,7 +608,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-bold">Transaction History</h3>
+              <h3 className="font-bold dark:text-white">Transaction History</h3>
               {state.earnings.slice().reverse().map(e => (
                 <div key={e.id} className="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex justify-between items-center group">
                   <div className="flex gap-4 items-center">
@@ -609,7 +616,7 @@ const App: React.FC = () => {
                       <Wallet size={20} />
                     </div>
                     <div>
-                      <p className="font-bold text-sm group-hover:text-pula-600 transition-colors">{e.source}</p>
+                      <p className="font-bold text-sm group-hover:text-pula-600 transition-colors dark:text-gray-100">{e.source}</p>
                       <p className="text-[10px] text-gray-400 font-bold uppercase">{e.date}</p>
                     </div>
                   </div>
@@ -632,39 +639,39 @@ const App: React.FC = () => {
 
              <div className="grid grid-cols-3 gap-3">
                 {Object.values(ApplicationStatus).map(status => (
-                  <div key={status} className={`p-4 rounded-3xl border border-gray-100 dark:border-gray-700 text-center ${status === ApplicationStatus.HIRED ? 'bg-pula-50 dark:bg-pula-900/10 border-pula-200' : 'bg-white dark:bg-gray-800'}`}>
+                  <div key={status} className={`p-4 rounded-3xl border border-gray-100 dark:border-gray-700 text-center ${status === ApplicationStatus.HIRED ? 'bg-pula-50 dark:bg-pula-900/20 border-pula-200 dark:border-pula-800' : 'bg-white dark:bg-gray-800'}`}>
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{status}</p>
-                    <p className={`text-xl font-black ${status === ApplicationStatus.HIRED ? 'text-pula-600' : ''}`}>{state.applications.filter(a => a.status === status).length}</p>
+                    <p className={`text-xl font-black ${status === ApplicationStatus.HIRED ? 'text-pula-600' : 'dark:text-white'}`}>{state.applications.filter(a => a.status === status).length}</p>
                   </div>
                 ))}
              </div>
 
              <div className="space-y-3">
-               <h3 className="font-bold">Application Log</h3>
+               <h3 className="font-bold dark:text-white">Application Log</h3>
                {state.applications.slice().reverse().map(a => (
                  <div key={a.id} className="bg-white dark:bg-gray-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-4">
                     <div className="flex justify-between items-start">
                       <div className="flex gap-4 items-center">
-                        <div className="w-10 h-10 bg-calm-50 dark:bg-calm-900/30 rounded-xl flex items-center justify-center text-calm-600 font-black text-xs uppercase">
+                        <div className="w-10 h-10 bg-calm-50 dark:bg-calm-900/40 rounded-xl flex items-center justify-center text-calm-600 dark:text-calm-400 font-black text-xs uppercase border dark:border-calm-800">
                           {a.platform.substring(0, 1)}
                         </div>
                         <div>
-                          <p className="font-black text-sm">{a.jobTitle}</p>
+                          <p className="font-black text-sm dark:text-white">{a.jobTitle}</p>
                           <p className="text-[10px] text-gray-400 font-bold uppercase">{a.platform} • {a.date}</p>
                         </div>
                       </div>
                       <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${
-                        a.status === ApplicationStatus.HIRED ? 'bg-pula-100 text-pula-700' :
-                        a.status === ApplicationStatus.REJECTED ? 'bg-red-100 text-red-700' :
-                        'bg-gray-100 text-gray-700'
+                        a.status === ApplicationStatus.HIRED ? 'bg-pula-100 dark:bg-pula-900/50 text-pula-700 dark:text-pula-300 border dark:border-pula-800' :
+                        a.status === ApplicationStatus.REJECTED ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 border dark:border-red-800' :
+                        'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border dark:border-gray-600'
                       }`}>
                         {a.status}
                       </div>
                     </div>
                     {a.status === ApplicationStatus.PENDING && (
                       <div className="flex gap-2">
-                        <button onClick={() => setState(p => ({ ...p, applications: p.applications.map(app => app.id === a.id ? { ...app, status: ApplicationStatus.HIRED } : app) }))} className="flex-1 bg-pula-600 text-white text-[10px] font-black py-2.5 rounded-xl shadow-md shadow-pula-500/10">HIRED</button>
-                        <button onClick={() => setState(p => ({ ...p, applications: p.applications.map(app => app.id === a.id ? { ...app, status: ApplicationStatus.REJECTED } : app) }))} className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-black py-2.5 rounded-xl">REJECTED</button>
+                        <button onClick={() => setState(p => ({ ...p, applications: p.applications.map(app => app.id === a.id ? { ...app, status: ApplicationStatus.HIRED } : app) }))} className="flex-1 bg-pula-600 text-white text-[10px] font-black py-2.5 rounded-xl shadow-md shadow-pula-500/10 active:scale-95 transition-all">HIRED</button>
+                        <button onClick={() => setState(p => ({ ...p, applications: p.applications.map(app => app.id === a.id ? { ...app, status: ApplicationStatus.REJECTED } : app) }))} className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-black py-2.5 rounded-xl active:scale-95 transition-all">REJECTED</button>
                       </div>
                     )}
                  </div>
@@ -678,7 +685,7 @@ const App: React.FC = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-black">Skill Mastery</h2>
+                <h2 className="text-2xl font-black dark:text-white">Skill Mastery</h2>
                 <p className="text-sm text-gray-400">Master of none, becoming master of some.</p>
               </div>
               <button onClick={() => setShowLogModal('addSkill')} className="w-12 h-12 bg-amber-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30 active:scale-90 transition-transform">
@@ -695,12 +702,12 @@ const App: React.FC = () => {
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-black group-hover:text-amber-600 transition-colors text-lg">{skill.name}</h4>
+                          <h4 className="font-black group-hover:text-amber-600 transition-colors text-lg dark:text-gray-100">{skill.name}</h4>
                           {skill.isDefault && <Star size={14} className="text-amber-400 fill-amber-400" />}
                         </div>
                         <div className="flex gap-3">
-                           <span className="text-[10px] font-black uppercase text-amber-600 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-lg border border-amber-100 dark:border-amber-800/30">{skill.level}</span>
-                           <span className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">
+                           <span className="text-[10px] font-black uppercase text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg border border-amber-100 dark:border-amber-800/50">{skill.level}</span>
+                           <span className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1 tracking-wide">
                              <Target size={10} /> {hours} / {skill.goalHours}h Goal
                            </span>
                         </div>
@@ -712,7 +719,7 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-4 border border-gray-50 dark:border-gray-800">
+                    <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-4 border border-gray-50 dark:border-gray-900">
                       <div className="h-full bg-amber-500 rounded-full transition-all duration-1000" style={{ width: `${progress}%` }} />
                     </div>
 
@@ -734,12 +741,12 @@ const App: React.FC = () => {
               })}
               {activeSkills.length === 0 && (
                 <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-gray-700">
-                   <p className="text-gray-400 font-medium">No active skills. Let's add one!</p>
+                   <p className="text-gray-400 font-medium tracking-wide">No active skills. Let's add one!</p>
                 </div>
               )}
             </div>
             
-            <div className="bg-amber-50/50 dark:bg-amber-900/10 p-5 rounded-3xl border border-amber-100 dark:border-amber-800/50 flex gap-4 items-start">
+            <div className="bg-amber-50/50 dark:bg-amber-900/20 p-5 rounded-3xl border border-amber-100 dark:border-amber-800/50 flex gap-4 items-start shadow-sm">
               <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">
                 Research says learning for 30 mins daily builds a career in 2 years. Start with 10 mins!
@@ -752,8 +759,8 @@ const App: React.FC = () => {
         {activeTab === 'settings' && (
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div className="p-6 bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                <h3 className="font-black flex items-center gap-3"><Settings size={18} /> Settings</h3>
+              <div className="p-6 bg-gray-50/50 dark:bg-gray-900/40 border-b border-gray-100 dark:border-gray-700">
+                <h3 className="font-black flex items-center gap-3 dark:text-white"><Settings size={18} /> Settings</h3>
               </div>
               <div className="p-8 space-y-6">
                 <div>
@@ -774,12 +781,12 @@ const App: React.FC = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-               <button onClick={() => setShowLogModal('weeklyGoal')} className="w-full flex items-center justify-between p-4 bg-pula-50/50 dark:bg-pula-900/10 rounded-2xl mb-4 group active:scale-[0.98] transition-transform">
+               <button onClick={() => setShowLogModal('weeklyGoal')} className="w-full flex items-center justify-between p-4 bg-pula-50/50 dark:bg-pula-900/20 rounded-2xl mb-4 group active:scale-[0.98] transition-transform border dark:border-pula-900/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-pula-600 shadow-sm group-active:scale-90 transition-transform">
+                    <div className="w-10 h-10 bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center text-pula-600 shadow-sm group-active:scale-90 transition-transform">
                       <Target size={20} />
                     </div>
-                    <span className="font-bold">Add Weekly Goal</span>
+                    <span className="font-bold dark:text-gray-100">Add Weekly Goal</span>
                   </div>
                   <Plus size={20} className="text-pula-600" />
                </button>
@@ -801,13 +808,13 @@ const App: React.FC = () => {
                <button onClick={exportData} className="flex items-center justify-between p-6 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98] transition-all">
                   <div className="flex items-center gap-4">
                     <Download className="text-calm-600" />
-                    <span className="font-bold">Backup Your Progress</span>
+                    <span className="font-bold dark:text-gray-100">Backup Your Progress</span>
                   </div>
                   <ChevronRight size={18} className="text-gray-300" />
                </button>
                <button 
                  onClick={resetApp} 
-                 className="flex items-center justify-between p-6 bg-red-50/50 dark:bg-red-900/10 rounded-3xl border border-red-100 dark:border-red-900/30 text-red-600 active:scale-[0.98] transition-all"
+                 className="flex items-center justify-between p-6 bg-red-50/50 dark:bg-red-900/20 rounded-3xl border border-red-100 dark:border-red-900/40 text-red-600 active:scale-[0.98] transition-all"
                >
                   <div className="flex items-center gap-4">
                     <Trash2 />
@@ -842,12 +849,12 @@ const App: React.FC = () => {
                   notes: (fd.get('notes') as string) || ''
                 });
               }} className="space-y-6">
-                <h2 className="text-3xl font-black mb-2">Logged! 💰</h2>
+                <h2 className="text-3xl font-black mb-2 dark:text-white">Logged! 💰</h2>
                 <p className="text-sm text-gray-400 font-medium mb-6">Every Pula counts towards your freedom.</p>
                 <div className="space-y-4">
-                  <input name="source" required placeholder="Platform/Client (e.g. Fiverr)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold" />
-                  <input name="amount" type="number" step="0.01" required placeholder="Amount (P)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold text-xl" />
-                  <textarea name="notes" placeholder="Any details?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-medium h-28" />
+                  <input name="source" required placeholder="Platform/Client (e.g. Fiverr)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold dark:text-white" />
+                  <input name="amount" type="number" step="0.01" required placeholder="Amount (P)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold text-xl dark:text-white" />
+                  <textarea name="notes" placeholder="Any details?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-medium h-28 dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-pula-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-pula-500/20 active:scale-95 transition-transform">Save Earning</button>
               </form>
@@ -864,11 +871,11 @@ const App: React.FC = () => {
                   status: ApplicationStatus.PENDING
                 });
               }} className="space-y-6">
-                <h2 className="text-3xl font-black mb-2">Applied! 📄</h2>
+                <h2 className="text-3xl font-black mb-2 dark:text-white">Applied! 📄</h2>
                 <p className="text-sm text-gray-400 font-medium mb-6">Seeds planted today are harvests tomorrow.</p>
                 <div className="space-y-4">
-                  <input name="platform" required placeholder="Where? (e.g. Upwork, Facebook)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold" />
-                  <input name="title" required placeholder="Job Title (e.g. Virtual Assistant)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold" />
+                  <input name="platform" required placeholder="Where? (e.g. Upwork, Facebook)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
+                  <input name="title" required placeholder="Job Title (e.g. Virtual Assistant)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-calm-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-calm-500/20 active:scale-95 transition-transform">Log Application</button>
               </form>
@@ -886,12 +893,12 @@ const App: React.FC = () => {
                   isDefault: false
                 });
               }} className="space-y-6">
-                <h2 className="text-3xl font-black mb-2">New Path 🚀</h2>
+                <h2 className="text-3xl font-black mb-2 dark:text-white">New Path 🚀</h2>
                 <p className="text-sm text-gray-400 font-medium mb-6">What mountain are we climbing today?</p>
                 <div className="space-y-4">
-                  <input name="name" required placeholder="Skill Name (e.g. Welding, Python)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold" />
-                  <input name="goal" type="number" required placeholder="Total Goal (Hours)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold" />
-                  <input name="resources" placeholder="Resources (Links, Books...)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium" />
+                  <input name="name" required placeholder="Skill Name (e.g. Welding, Python)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
+                  <input name="goal" type="number" required placeholder="Total Goal (Hours)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
+                  <input name="resources" placeholder="Resources (Links, Books...)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Create Skill</button>
               </form>
@@ -911,12 +918,12 @@ const App: React.FC = () => {
                   });
                 }
               }} className="space-y-6">
-                <h2 className="text-3xl font-black mb-2">Leveled Up! ⚡</h2>
+                <h2 className="text-3xl font-black mb-2 dark:text-white">Leveled Up! ⚡</h2>
                 <p className="text-sm text-gray-400 font-medium mb-6">Study hard, work easier.</p>
                 <div className="space-y-4">
-                  <input name="mins" type="number" required placeholder="Duration (Minutes)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-xl" />
-                  <input name="desc" required placeholder="What did you study?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold" />
-                  <textarea name="notes" placeholder="What did you learn?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium h-24" />
+                  <input name="mins" type="number" required placeholder="Duration (Minutes)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-xl dark:text-white" />
+                  <input name="desc" required placeholder="What did you study?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
+                  <textarea name="notes" placeholder="What did you learn?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium h-24 dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Log Session</button>
               </form>
@@ -928,12 +935,12 @@ const App: React.FC = () => {
                  const fd = new FormData(e.currentTarget);
                  addCustomBadge(fd.get('name') as string, fd.get('icon') as string);
                }} className="space-y-6">
-                 <h2 className="text-3xl font-black mb-2">Celebrate! 🏆</h2>
+                 <h2 className="text-3xl font-black mb-2 dark:text-white">Celebrate! 🏆</h2>
                  <p className="text-sm text-gray-400 font-medium mb-6">Create your own milestones.</p>
                  <div className="space-y-4">
-                    <input name="name" required placeholder="Milestone Name (e.g. First P1000)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold" />
+                    <input name="name" required placeholder="Milestone Name (e.g. First P1000)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
                     <div className="flex gap-4">
-                       <input name="icon" required placeholder="Emoji Icon" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-center text-3xl h-20" />
+                       <input name="icon" required placeholder="Emoji Icon" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-center text-3xl h-20 dark:text-white" />
                     </div>
                  </div>
                  <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Achieve It</button>
@@ -946,9 +953,9 @@ const App: React.FC = () => {
                  const fd = new FormData(e.currentTarget);
                  addWeeklyGoal(fd.get('goal') as string);
                }} className="space-y-6">
-                 <h2 className="text-3xl font-black mb-2">Aim High 🎯</h2>
+                 <h2 className="text-3xl font-black mb-2 dark:text-white">Aim High 🎯</h2>
                  <p className="text-sm text-gray-400 font-medium mb-6">Focus for Week {weekNum}.</p>
-                 <input name="goal" required placeholder="What will you achieve this week?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold" />
+                 <input name="goal" required placeholder="What will you achieve this week?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold dark:text-white" />
                  <button type="submit" className="w-full bg-pula-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-pula-500/20 active:scale-95 transition-transform">Set Goal</button>
                </form>
             )}
@@ -956,29 +963,29 @@ const App: React.FC = () => {
             {showLogModal === 'weeklyReview' && (
               <div className="space-y-8">
                  <div>
-                    <h2 className="text-3xl font-black mb-1">Week {weekNum} Snapshot</h2>
+                    <h2 className="text-3xl font-black mb-1 dark:text-white">Week {weekNum} Snapshot</h2>
                     <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">Growth Summary</p>
                  </div>
                  
                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-pula-50 dark:bg-pula-900/10 p-6 rounded-3xl border border-pula-100 dark:border-pula-800/50">
-                       <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Earned</p>
-                       <p className="text-2xl font-black text-pula-600">{formatPula(totalEarnings)}</p>
+                    <div className="bg-pula-50 dark:bg-pula-900/40 p-6 rounded-3xl border border-pula-100 dark:border-pula-800">
+                       <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Earned</p>
+                       <p className="text-2xl font-black text-pula-600 dark:text-pula-400">{formatPula(totalEarnings)}</p>
                     </div>
-                    <div className="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-3xl border border-amber-100 dark:border-amber-800/50">
-                       <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Studied</p>
-                       <p className="text-2xl font-black text-amber-600">{totalHours}h</p>
+                    <div className="bg-amber-50 dark:bg-amber-900/40 p-6 rounded-3xl border border-amber-100 dark:border-amber-800">
+                       <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Studied</p>
+                       <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{totalHours}h</p>
                     </div>
                  </div>
 
                  <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-3xl border border-gray-100 dark:border-gray-700">
-                    <h4 className="font-bold text-sm mb-3 flex items-center gap-2">
+                    <h4 className="font-bold text-sm mb-3 flex items-center gap-2 dark:text-gray-300">
                        <History size={14} className="text-gray-400" /> Skill Breakdown
                     </h4>
                     <div className="space-y-2">
                        {activeSkills.map(s => (
                           <div key={s.id} className="flex justify-between text-xs font-medium">
-                             <span className="text-gray-500">{s.name}</span>
+                             <span className="text-gray-500 dark:text-gray-400">{s.name}</span>
                              <span className="font-bold text-gray-900 dark:text-white">{getSkillHours(s.id)}h</span>
                           </div>
                        ))}
@@ -993,7 +1000,7 @@ const App: React.FC = () => {
       )}
 
       {/* Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-gray-100 dark:border-gray-800 px-4 pb-6 pt-3 z-40 max-w-md mx-auto shadow-2xl">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 px-4 pb-6 pt-3 z-40 max-w-md mx-auto shadow-2xl">
         <div className="flex justify-between items-center gap-1">
           <TabButton id="dashboard" icon={LayoutDashboard} label="Home" />
           <TabButton id="tasks" icon={CheckSquare} label="Habits" />
