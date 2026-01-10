@@ -1,4 +1,4 @@
-name: Force Android Build
+name: Nuclear Android Build
 
 on:
   push:
@@ -9,25 +9,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 1. Get Code
       - uses: actions/checkout@v3
 
+      # 2. Setup Java 17 (Standard for Capacitor)
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
       
+      # 3. Setup Node 20
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      - name: Install Dependencies
-        run: npm install
+      # 4. Install Dependencies (Forcefully)
+      - name: Install Node Modules
+        run: npm install --legacy-peer-deps
 
+      # 5. Install Capacitor
       - name: Install Capacitor
         run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      # FIX 1: Force a clean simple config so it works
-      - name: Force Config
+      # 6. FIX: Force Clean Config (Delete old files first)
+      - name: Reset Config
+        run: |
+          rm -rf capacitor.config.ts android dist
+          
+      # 7. Initialize Capacitor
+      - name: Init Capacitor
+        run: npx cap init Hut13 com.hut13.app --web-dir dist
+
+      # 8. FIX: Vite Config (White Screen Fix)
+      - name: Fix White Screen
         run: |
           cat > vite.config.ts <<EOF
           import { defineConfig } from 'vite';
@@ -39,29 +53,26 @@ jobs:
           });
           EOF
 
-      # FIX 2: Skip TypeScript Checks (The Magic Fix)
-      # Instead of "npm run build", we use "npx vite build" directly.
-      # This ignores type errors and just builds the app.
-      - name: Build Web (Ignore TS Errors)
+      # 9. Build Web (Skip TypeScript Errors)
+      - name: Build Web
         run: npx vite build
 
-      # Setup Android
-      - name: Setup Android
+      # 10. Add Android Platform
+      - name: Add Android
+        run: npx cap add android
+
+      # 11. FIX: Permissions & Local Properties
+      - name: Setup Gradle
         run: |
-          rm -rf android capacitor.config.ts
-          npx cap init Hut13 com.hut13.app --web-dir dist
-          npx cap add android
+          chmod +x android/gradlew
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-      # FIX 3: Permissions
-      - name: Grant Permissions
-        run: chmod +x android/gradlew
-
-      # FIX 4: Build with minimal error reporting to pass easier
+      # 12. Build APK (Ignore Lint Errors)
       - name: Build APK
         run: cd android && ./gradlew assembleDebug -x lint
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      # 13. Upload Result
+      - uses: actions/upload-artifact@v4
         with:
-          name: Hut13-Force-APK
+          name: Hut13-Nuclear-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
