@@ -16,21 +16,38 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - run: npm install
-      - run: npm install @capacitor/core @capacitor/cli @capacitor/android
+      - name: Install Dependencies
+        run: npm install
 
-      # Initialize & Fix White Screen
-      - run: npx cap init Hut13 com.hut13.app --web-dir dist || true
-      - run: sed -i "s/export default defineConfig({/export default defineConfig({ base: '.\/',/" vite.config.ts
+      - name: Install Capacitor
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      # Build
-      - run: npm run build
-      - run: rm -rf android
-      - run: npx cap add android
-      - run: cd android && ./gradlew assembleDebug
+      - name: Clean Start
+        # Delete old config and android folder to prevent conflicts
+        run: rm -rf capacitor.config.ts android
 
-      # Upload APK
-      - uses: actions/upload-artifact@v4
+      - name: Init App
+        run: npx cap init Hut13 com.hut13.app --web-dir dist
+
+      - name: Fix White Screen
+        # This forces the base path to ./ so the app isn't blank
+        run: sed -i "s/export default defineConfig({/export default defineConfig({ base: '.\/',/" vite.config.ts
+
+      - name: Build Web
+        run: npm run build
+
+      - name: Add Android
+        run: npx cap add android
+
+      - name: Fix Permissions (The Important Fix)
+        # This is likely why your last build failed!
+        run: chmod +x android/gradlew
+
+      - name: Build APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: Hut13-App
           path: android/app/build/outputs/apk/debug/app-debug.apk
