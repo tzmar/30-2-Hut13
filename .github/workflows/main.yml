@@ -1,53 +1,70 @@
-name: Build APK
+name: Fresh Start Build
 
-on: push
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 1. Get the code
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+      # 2. Setup Tools (Java 17 is best for Android)
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
-      - name: Install Dependencies
+      # 3. Install Dependencies
+      - name: Install Node Modules
         run: npm install
 
+      # 4. Install Capacitor
       - name: Install Capacitor
         run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Clean Start
-        # Delete old config and android folder to prevent conflicts
-        run: rm -rf capacitor.config.ts android
+      # 5. FIX: Force the Config to be correct (Prevents White Screen)
+      # We overwrite the file completely so there are no mistakes
+      - name: Fix Vite Config
+        run: |
+          cat > vite.config.ts <<EOF
+          import { defineConfig } from 'vite';
+          import react from '@vitejs/plugin-react';
+          export default defineConfig({
+            plugins: [react()],
+            base: './',
+          });
+          EOF
 
-      - name: Init App
-        run: npx cap init Hut13 com.hut13.app --web-dir dist
-
-      - name: Fix White Screen
-        # This forces the base path to ./ so the app isn't blank
-        run: sed -i "s/export default defineConfig({/export default defineConfig({ base: '.\/',/" vite.config.ts
-
-      - name: Build Web
+      # 6. Build the Website (Creates dist folder)
+      - name: Build Web Assets
         run: npm run build
 
-      - name: Add Android
-        run: npx cap add android
+      # 7. Setup Android
+      # We clean up old files first to be safe
+      - name: Setup Android Project
+        run: |
+          rm -rf android capacitor.config.ts
+          npx cap init Hut13 com.hut13.app --web-dir dist
+          npx cap add android
 
-      - name: Fix Permissions (The Important Fix)
-        # This is likely why your last build failed!
+      # 8. FIX: Grant Permissions (Crucial Step)
+      - name: Make Gradle Executable
         run: chmod +x android/gradlew
 
+      # 9. Build the APK
       - name: Build APK
         run: cd android && ./gradlew assembleDebug
 
+      # 10. Save the File
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Hut13-App
+          name: Hut13-Fresh-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
