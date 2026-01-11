@@ -46,9 +46,9 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-import { AppState, ApplicationStatus, Earning, Application, SkillLog, Skill, SkillLevel, CustomBadge } from './types';
-import { WEEKLY_TASKS, DEFAULT_SKILLS, MOTIVATIONAL_QUOTES, BADGE_DEFINITIONS, TARGET_MIN, TARGET_MAX } from './constants';
-import { formatPula, getDateKey, getWeekNumber, calculateStreak } from './utils';
+import { AppState, ApplicationStatus, Earning, Application, SkillLog, Skill, SkillLevel, CustomBadge } from './types.ts';
+import { WEEKLY_TASKS, DEFAULT_SKILLS, MOTIVATIONAL_QUOTES, BADGE_DEFINITIONS, TARGET_MIN, TARGET_MAX } from './constants.ts';
+import { formatPula, getDateKey, getWeekNumber, calculateStreak } from './utils.ts';
 
 // --- Subcomponents ---
 
