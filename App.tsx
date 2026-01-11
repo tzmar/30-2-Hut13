@@ -34,7 +34,8 @@ import {
   CloudCheck,
   PartyPopper,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Share
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -190,6 +191,7 @@ const App: React.FC = () => {
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [hasDismissedGraduation, setHasDismissedGraduation] = useState(false);
+  const [showOfflineReady, setShowOfflineReady] = useState(false);
 
   // Gesture Refs
   const touchStartX = useRef(0);
@@ -204,6 +206,15 @@ const App: React.FC = () => {
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Show "Ready for Offline" toast if service worker is active
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(() => {
+        setShowOfflineReady(true);
+        setTimeout(() => setShowOfflineReady(false), 5000);
+      });
+    }
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -261,15 +272,12 @@ const App: React.FC = () => {
     const deltaX = touchEndX - touchStartX.current;
     const deltaY = touchEndY - touchStartY.current;
 
-    // Minimum distance for a swipe, and ensure it's mostly horizontal
     const swipeThreshold = 50;
     if (Math.abs(deltaX) > swipeThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
       const currentIndex = TABS.indexOf(activeTab);
       if (deltaX > 0) {
-        // Swipe Right (Move Left)
         if (currentIndex > 0) setActiveTab(TABS[currentIndex - 1]);
       } else {
-        // Swipe Left (Move Right)
         if (currentIndex < TABS.length - 1) setActiveTab(TABS[currentIndex + 1]);
       }
     }
@@ -421,6 +429,22 @@ const App: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '30-Day Hustle Tracker',
+          text: `Check out my progress! I've earned ${formatPula(totalEarnings)} and built a ${streakCount} day streak.`,
+          url: window.location.href
+        });
+      } catch (err) {
+        console.log('Share failed:', err);
+      }
+    } else {
+      alert("Sharing is not supported on this browser. Try copying the link!");
+    }
+  };
+
   // UI Helpers
   const TabButton = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => (
     <button 
@@ -454,6 +478,14 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen pb-24 dark:bg-gray-900 transition-colors">
       
+      {/* Offline Toast */}
+      {showOfflineReady && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gray-900/90 dark:bg-pula-600 text-white px-6 py-3 rounded-full shadow-2xl backdrop-blur-md flex items-center gap-3 animate-in slide-in-from-top-4 duration-500">
+           <CloudCheck size={18} />
+           <span className="text-xs font-black uppercase tracking-widest">Ready for Offline Use</span>
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-3">
@@ -555,7 +587,6 @@ const App: React.FC = () => {
                 <Award className="w-5 h-5 text-amber-500" /> Your Milestones
               </h3>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {/* 30-Day Survivor Badge (Dynamic) */}
                 {currentDay >= 30 && (
                   <div className="flex-shrink-0 flex flex-col items-center gap-2">
                     <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl bg-amber-100 dark:bg-amber-900/40 border-2 border-amber-400 shadow-lg shadow-amber-500/20">
@@ -564,7 +595,6 @@ const App: React.FC = () => {
                     <span className="text-[9px] font-black text-center w-16 leading-tight uppercase text-amber-600 dark:text-amber-400">Graduate</span>
                   </div>
                 )}
-                {/* Built-in Badges */}
                 {BADGE_DEFINITIONS.map(badge => (
                   <div key={badge.id} className={`flex-shrink-0 flex flex-col items-center gap-2 transition-all ${badge.criteria(state) ? 'opacity-100 scale-100' : 'opacity-20 grayscale'}`}>
                     <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-sm ${badge.criteria(state) ? 'bg-amber-50 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-700' : 'bg-gray-100 dark:bg-gray-800'}`}>
@@ -573,7 +603,6 @@ const App: React.FC = () => {
                     <span className="text-[9px] font-bold text-center w-16 leading-tight uppercase text-gray-500 dark:text-gray-400">{badge.name}</span>
                   </div>
                 ))}
-                {/* Custom Badges */}
                 {state.customBadges.map(badge => (
                   <div key={badge.id} className="flex-shrink-0 flex flex-col items-center gap-2">
                     <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl bg-pula-50 dark:bg-pula-900/30 border-2 border-pula-200 dark:border-pula-700 shadow-sm">
@@ -869,13 +898,6 @@ const App: React.FC = () => {
                 </div>
               )}
             </div>
-            
-            <div className="bg-amber-50/50 dark:bg-amber-900/20 p-5 rounded-3xl border border-amber-100 dark:border-amber-800/50 flex gap-4 items-start shadow-sm">
-              <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">
-                Research says learning for 30 mins daily builds a career in 2 years. Start with 10 mins!
-              </p>
-            </div>
           </div>
         )}
 
@@ -904,42 +926,22 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-               <button onClick={() => setShowLogModal('weeklyGoal')} className="w-full flex items-center justify-between p-4 bg-pula-50/50 dark:bg-pula-900/20 rounded-2xl mb-4 group active:scale-[0.98] transition-transform border dark:border-pula-900/50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-pula-600 shadow-sm group-active:scale-90 transition-transform">
-                      <Target size={20} />
-                    </div>
-                    <span className="font-bold dark:text-gray-100">Add Weekly Goal</span>
-                  </div>
-                  <Plus size={20} className="text-pula-600" />
-               </button>
-               
-               <div className="space-y-4 px-2">
-                 {state.weeklyGoals[weekNum]?.map((goal, i) => (
-                    <div key={i} className="flex gap-3 items-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                       <ArrowRight size={14} className="text-pula-500" />
-                       {goal}
-                    </div>
-                 ))}
-                 {(!state.weeklyGoals[weekNum] || state.weeklyGoals[weekNum].length === 0) && (
-                   <p className="text-xs text-center text-gray-400 italic py-2">No weekly goals set yet.</p>
-                 )}
-               </div>
-            </div>
-
             <div className="flex flex-col gap-3">
+               <button onClick={handleShare} className="flex items-center justify-between p-6 bg-pula-600 text-white rounded-3xl shadow-xl shadow-pula-500/20 active:scale-[0.98] transition-all">
+                  <div className="flex items-center gap-4">
+                    <Share2 />
+                    <span className="font-bold">Share Your Success</span>
+                  </div>
+                  <ChevronRight size={18} className="text-pula-100" />
+               </button>
                <button onClick={exportData} className="flex items-center justify-between p-6 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98] transition-all">
                   <div className="flex items-center gap-4">
                     <Download className="text-calm-600" />
-                    <span className="font-bold dark:text-gray-100">Backup Your Progress</span>
+                    <span className="font-bold dark:text-gray-100">Backup Progress</span>
                   </div>
                   <ChevronRight size={18} className="text-gray-300" />
                </button>
-               <button 
-                 onClick={resetApp} 
-                 className="flex items-center justify-between p-6 bg-red-50/50 dark:bg-red-900/20 rounded-3xl border border-red-100 dark:border-red-900/40 text-red-600 active:scale-[0.98] transition-all"
-               >
+               <button onClick={resetApp} className="flex items-center justify-between p-6 bg-red-50/50 dark:bg-red-900/20 rounded-3xl border border-red-100 dark:border-red-900/40 text-red-600 active:scale-[0.98] transition-all">
                   <div className="flex items-center gap-4">
                     <Trash2 />
                     <span className="font-bold">Reset Tracker</span>
@@ -948,7 +950,7 @@ const App: React.FC = () => {
                </button>
             </div>
             
-            <p className="text-[9px] text-center text-gray-400 font-bold uppercase tracking-[0.2em] pt-4">Botswana Hustle Tracker v2.0</p>
+            <p className="text-[9px] text-center text-gray-400 font-bold uppercase tracking-[0.2em] pt-4">Hustle Tracker v2.1 • Native Pro</p>
           </div>
         )}
       </main>
@@ -974,9 +976,8 @@ const App: React.FC = () => {
                 });
               }} className="space-y-6">
                 <h2 className="text-3xl font-black mb-2 dark:text-white">Logged! 💰</h2>
-                <p className="text-sm text-gray-400 font-medium mb-6">Every Pula counts towards your freedom.</p>
                 <div className="space-y-4">
-                  <input name="source" required placeholder="Platform/Client (e.g. Fiverr)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold dark:text-white" />
+                  <input name="source" required placeholder="Platform/Client" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold dark:text-white" />
                   <input name="amount" type="number" step="0.01" required placeholder="Amount (P)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold text-xl dark:text-white" />
                   <textarea name="notes" placeholder="Any details?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-medium h-28 dark:text-white" />
                 </div>
@@ -996,10 +997,9 @@ const App: React.FC = () => {
                 });
               }} className="space-y-6">
                 <h2 className="text-3xl font-black mb-2 dark:text-white">Applied! 📄</h2>
-                <p className="text-sm text-gray-400 font-medium mb-6">Seeds planted today are harvests tomorrow.</p>
                 <div className="space-y-4">
-                  <input name="platform" required placeholder="Where? (e.g. Upwork, Facebook)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
-                  <input name="title" required placeholder="Job Title (e.g. Virtual Assistant)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
+                  <input name="platform" required placeholder="Where? (e.g. Upwork)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
+                  <input name="title" required placeholder="Job Title" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-calm-500 font-bold dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-calm-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-calm-500/20 active:scale-95 transition-transform">Log Application</button>
               </form>
@@ -1018,11 +1018,10 @@ const App: React.FC = () => {
                 });
               }} className="space-y-6">
                 <h2 className="text-3xl font-black mb-2 dark:text-white">New Path 🚀</h2>
-                <p className="text-sm text-gray-400 font-medium mb-6">What mountain are we climbing today?</p>
                 <div className="space-y-4">
-                  <input name="name" required placeholder="Skill Name (e.g. Welding, Python)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
+                  <input name="name" required placeholder="Skill Name" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
                   <input name="goal" type="number" required placeholder="Total Goal (Hours)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
-                  <input name="resources" placeholder="Resources (Links, Books...)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium dark:text-white" />
+                  <input name="resources" placeholder="Resources" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Create Skill</button>
               </form>
@@ -1043,45 +1042,13 @@ const App: React.FC = () => {
                 }
               }} className="space-y-6">
                 <h2 className="text-3xl font-black mb-2 dark:text-white">Leveled Up! ⚡</h2>
-                <p className="text-sm text-gray-400 font-medium mb-6">Study hard, work easier.</p>
                 <div className="space-y-4">
                   <input name="mins" type="number" required placeholder="Duration (Minutes)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-xl dark:text-white" />
                   <input name="desc" required placeholder="What did you study?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
-                  <textarea name="notes" placeholder="What did you learn?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium h-24 dark:text-white" />
+                  <textarea name="notes" placeholder="Notes?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-medium h-24 dark:text-white" />
                 </div>
                 <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Log Session</button>
               </form>
-            )}
-
-            {showLogModal === 'customBadge' && (
-               <form onSubmit={(e) => {
-                 e.preventDefault();
-                 const fd = new FormData(e.currentTarget);
-                 addCustomBadge(fd.get('name') as string, fd.get('icon') as string);
-               }} className="space-y-6">
-                 <h2 className="text-3xl font-black mb-2 dark:text-white">Celebrate! 🏆</h2>
-                 <p className="text-sm text-gray-400 font-medium mb-6">Create your own milestones.</p>
-                 <div className="space-y-4">
-                    <input name="name" required placeholder="Milestone Name (e.g. First P1000)" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold dark:text-white" />
-                    <div className="flex gap-4">
-                       <input name="icon" required placeholder="Emoji Icon" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-amber-500 font-bold text-center text-3xl h-20 dark:text-white" />
-                    </div>
-                 </div>
-                 <button type="submit" className="w-full bg-amber-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 active:scale-95 transition-transform">Achieve It</button>
-               </form>
-            )}
-
-            {showLogModal === 'weeklyGoal' && (
-               <form onSubmit={(e) => {
-                 e.preventDefault();
-                 const fd = new FormData(e.currentTarget);
-                 addWeeklyGoal(fd.get('goal') as string);
-               }} className="space-y-6">
-                 <h2 className="text-3xl font-black mb-2 dark:text-white">Aim High 🎯</h2>
-                 <p className="text-sm text-gray-400 font-medium mb-6">Focus for Week {weekNum}.</p>
-                 <input name="goal" required placeholder="What will you achieve this week?" className="w-full p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none outline-none focus:ring-2 ring-pula-500 font-bold dark:text-white" />
-                 <button type="submit" className="w-full bg-pula-600 text-white p-6 rounded-2xl font-black text-lg shadow-xl shadow-pula-500/20 active:scale-95 transition-transform">Set Goal</button>
-               </form>
             )}
 
             {showLogModal === 'weeklyReview' && (
@@ -1099,20 +1066,6 @@ const App: React.FC = () => {
                     <div className="bg-amber-50 dark:bg-amber-900/30 p-6 rounded-3xl border border-amber-100 dark:border-amber-800/60 shadow-sm">
                        <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Studied</p>
                        <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{totalHours}h</p>
-                    </div>
-                 </div>
-
-                 <div className="bg-gray-50 dark:bg-gray-800/40 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/50">
-                    <h4 className="font-bold text-sm mb-3 flex items-center gap-2 dark:text-gray-300">
-                       <History size={14} className="text-gray-400" /> Skill Breakdown
-                    </h4>
-                    <div className="space-y-2">
-                       {activeSkills.map(s => (
-                          <div key={s.id} className="flex justify-between text-xs font-medium">
-                             <span className="text-gray-500 dark:text-gray-400">{s.name}</span>
-                             <span className="font-bold text-gray-900 dark:text-white">{getSkillHours(s.id)}h</span>
-                          </div>
-                       ))}
                     </div>
                  </div>
 
